@@ -35,7 +35,7 @@ return array(
     |
     */
 
-    'include_fluent' => false,
+    'include_fluent' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ return array(
     |
     */
 
-    'include_factory_builders' => false,
+    'include_factory_builders' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -116,7 +116,7 @@ return array(
     */
 
     'model_locations' => array(
-        'app',
+        'app/Models',
     ),
 
     /*
