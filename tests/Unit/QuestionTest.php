@@ -20,7 +20,7 @@ class QuestionTest extends TestCase
         $question = factory(Question::class)->create();
         factory(Answer::class)->create(['question_id' => $question->id]);
 
-        self::assertInstanceOf(HasMany::class,$question->answers());
+        self::assertInstanceOf(HasMany::class, $question->answers());
     }
 
     /** @test */
@@ -37,5 +37,14 @@ class QuestionTest extends TestCase
         self::assertTrue($publishedQuestions->contains($publishedQuestion1));
         self::assertTrue($publishedQuestions->contains($publishedQuestion2));
         self::assertFalse($publishedQuestions->contains($unpublishedQuestion));
+    }
+
+    /** @test */
+    public function can_mark_an_answer_as_best()
+    {
+        $question = create(Question::class, ['best_answer_id' => null]);
+        $answer = create(Answer::class, ['question_id' => $question->id]);
+        $question->markAsBestAnswer($answer);
+        self::assertSame($question->best_answer_id, $answer->id);
     }
 }

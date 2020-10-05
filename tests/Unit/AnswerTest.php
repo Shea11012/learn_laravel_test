@@ -1,0 +1,24 @@
+<?php
+
+namespace Tests\Unit;
+
+use App\Models\Answer;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class AnswerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function it_knows_if_it_is_the_best()
+    {
+        $answer = create(Answer::class);
+        self::assertFalse($answer->isBest());
+
+        $answer->question->update(['best_answer_id' => $answer->id]);
+
+        self::assertTrue($answer->isBest());
+    }
+}
