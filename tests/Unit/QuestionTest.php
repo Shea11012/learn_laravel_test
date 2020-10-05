@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Answer;
 use App\Models\Question;
+use App\Models\User;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -46,5 +47,12 @@ class QuestionTest extends TestCase
         $answer = create(Answer::class, ['question_id' => $question->id]);
         $question->markAsBestAnswer($answer);
         self::assertSame($question->best_answer_id, $answer->id);
+    }
+
+    /** @test */
+    public function a_question_belongs_to_a_creator()
+    {
+        $question = create(Question::class);
+        self::assertInstanceOf(User::class,$question->creator);
     }
 }

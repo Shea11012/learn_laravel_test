@@ -21,5 +21,8 @@ Route::group(['prefix' => 'v1'],function () {
         Route::delete('/answers/{answer}','AnswersController@destroy')->name('answers.destroy');
 
         Route::post('/answers/{answer}/best','BestAnswersController@store')->name('best-answers.store');
+
+        Route::post('/answers/{answer}/up-votes','AnswersUpVotesController@store')->name('answer-up-votes.store');
+        Route::delete('/answers/{answer}/up-votes','AnswersUpVotesController@destroy')->name('answer-up-votes.destroy');
     });
 });
