@@ -17,8 +17,8 @@ class QuestionsController extends Controller
         $question = Question::published()->findOrFail($questionId);
 
         return response()->json([
-            'title'=>$question->title,
-            'content' => $question->content,
+            'question'=>$question,
+            'answers' => $question->answers()->paginate(20),
         ]);
     }
 }

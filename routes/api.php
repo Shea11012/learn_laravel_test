@@ -13,11 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 Route::group(['prefix' => 'v1'],function () {
-    Route::get('questions','QuestionsController@index');
-    Route::get('/questions/{question}','QuestionsController@show');
+    Route::get('questions','QuestionsController@index')->name('questions.list');
+    Route::get('/questions/{question}','QuestionsController@show')->name('questions.show');
 
     Route::group(['middleware' => 'auth:api'],function () {
         Route::post('/questions/{question}/answers','AnswersController@store')->name('answers.store');
+        Route::delete('/answers/{answer}','AnswersController@destroy')->name('answers.destroy');
 
         Route::post('/answers/{answer}/best','BestAnswersController@store')->name('best-answers.store');
     });

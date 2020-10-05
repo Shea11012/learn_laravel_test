@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Questions;
 
+use App\Models\Answer;
 use App\Models\Question;
 use Carbon\Carbon;
 use Tests\TestCase;
@@ -25,10 +26,8 @@ class ViewQuestionsTest extends TestCase
         $question = factory(Question::class)->create(['published_at' => Carbon::parse('-1 week')]);
         $this->get('/api/v1/questions/'.$question->id)
             ->assertStatus(200)
-            ->assertJson([
-                'title' => $question->title,
-                'content' => $question->content,
-            ]);
+            ->assertSee($question->title)
+            ->assertSee($question->content);
     }
 
     /** @test */
@@ -47,9 +46,21 @@ class ViewQuestionsTest extends TestCase
         $test = $this->get('/api/v1/questions/'.$question->id);
 
         $test->assertStatus(200)
-            ->assertJson([
-                'title' => $question->title,
-                'content' => $question->content,
-            ]);
+            ->assertSee($question->title)
+            ->assertSee($question->content);
+    }
+
+    /** @test */
+    public function can_see_answers_when_view_a_published_question()
+    {
+        $question = factory(Question::class)->states('published')->create();
+        create(Answer::class,['question_id' => $question->id],40);
+
+        $response = $this->get(route('questions.show',['question' => $question]));
+
+        $result = $response->jsonData('answers')->toArray();
+        self::assertCount(20,$result['data']);
+        self::assertEquals(40,$result['total']);
+
     }
 }

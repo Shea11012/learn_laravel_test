@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\TestResponse;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -13,6 +14,9 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->withoutExceptionHandling();
+        TestResponse::macro('jsonData',function ($key) {
+            return $this->original[$key];
+        });
     }
 
     protected function signIn($user = null,$guard = 'api'): TestCase
@@ -20,5 +24,11 @@ abstract class TestCase extends BaseTestCase
         $user = $user ?: create(User::class);
         $this->actingAs($user,$guard);
         return $this;
+    }
+
+    protected function assertResponseSuccess($response,$content)
+    {
+        $response->assertStatus(200);
+        $response->assertJson($content);
     }
 }
