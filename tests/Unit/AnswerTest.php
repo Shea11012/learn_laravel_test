@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Answer;
 use App\Models\User;
+use App\Models\Vote;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -67,5 +68,85 @@ class AnswerTest extends TestCase
             'voted_id' => $answer->id,
             'voted_type' => get_class($answer),
         ]);
+    }
+
+    /** @test */
+    public function can_know_it_is_voted_up()
+    {
+        $user = create(User::class);
+        $answer = create(Answer::class);
+        create(Vote::class,[
+            'user_id' => $user->id,
+            'voted_id' => $answer->id,
+            'voted_type' => get_class($answer),
+        ]);
+
+        self::assertTrue($answer->fresh()->isVotedUp($user));
+    }
+
+    /** @test */
+    public function can_vote_down_an_answer()
+    {
+        $this->signIn();
+        $answer = create(Answer::class);
+        $this->assertDatabaseMissing('votes',[
+            'user_id' => auth()->id(),
+            'voted_id' => $answer->id,
+            'voted_type' => get_class($answer),
+            'type' => 'vote_down',
+        ]);
+
+        $answer->voteDown(\Auth::user());
+
+        $this->assertDatabaseHas('votes',[
+            'user_id' => auth()->id(),
+            'voted_id' => $answer->id,
+            'voted_type' => get_class($answer),
+            'type' => 'vote_down',
+        ]);
+    }
+
+    /** @test */
+    public function can_cancel_vote_down_answer()
+    {
+        $this->signIn();
+        $answer = create(Answer::class);
+        $answer->voteDown(\Auth::user());
+        $answer->cancelVoteDown(\Auth::user());
+        $this->assertDatabaseMissing('votes',[
+            'user_id' => auth()->id(),
+            'voted_id' => $answer->id,
+            'voted_type' => get_class($answer),
+        ]);
+    }
+
+    /** @test */
+    public function can_vote_down_only_once()
+    {
+        $this->signIn();
+        $answer = create(Answer::class);
+        try {
+            $this->post(route('answer-down-votes.destroy',['answer' => $answer]));
+            $this->post(route('answer-down-votes.destroy',['answer' => $answer]));
+        } catch (\Exception $exception) {
+            $this->fail('Can not vote down twice');
+        }
+
+        self::assertCount(1,$answer->refresh()->votes('vote_down')->get());
+    }
+
+    /** @test */
+    public function can_know_it_is_voted_down()
+    {
+        $user = create(User::class);
+        $answer = create(Answer::class);
+        create(Vote::class,[
+            'user_id' => $user->id,
+            'voted_id' => $answer->id,
+            'voted_type' => get_class($answer),
+            'type' => 'vote_down',
+        ]);
+
+        self::assertTrue($answer->refresh()->isVotedDown($user));
     }
 }
