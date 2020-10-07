@@ -72,7 +72,6 @@ class PostAnswersTest extends TestCase
             'content' => null,
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('content');
+        $response->assertJsonValidationErrors('content');
     }
 }

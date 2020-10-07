@@ -16,6 +16,7 @@ class CreateQuestionsTable extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
+            $table->unsignedInteger('category_id');
             $table->unsignedInteger('best_answer_id')->nullable();
             $table->string('title');
             $table->text('content');
