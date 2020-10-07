@@ -4,6 +4,7 @@ namespace Tests\Feature\Questions;
 
 use App\Models\Category;
 use App\Models\Question;
+use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -72,5 +73,17 @@ class CreateQuestionsTest extends TestCase
         $response = $this->post(route('questions.store'),$question->toArray());
 
         $response->assertJsonValidationErrors('category_id');
+    }
+
+    /** @test */
+    public function authenticated_users_must_confirm_email_address_before_creating_questions()
+    {
+        $this->signIn(create(User::class,['email_verified_at' => null]));
+        $question = make(Question::class);
+        $response = $this->post(route('questions.store'),$question->toArray());
+
+        $response->assertJson([
+            'message' => 'please verify your email',
+        ]);
     }
 }
