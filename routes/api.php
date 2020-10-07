@@ -29,5 +29,6 @@ Route::group(['prefix' => 'v1'],function () {
         Route::delete('/answers/{answer}/down-votes','AnswerDownVotesController@destroy')->name('answer-down-votes.destroy');
 
         Route::post('/questions','QuestionsController@store')->name('questions.store');
+        Route::post('/questions/{question}/published-questions','PublishedQuestionsController@store')->name('published-questions.store');
     });
 });

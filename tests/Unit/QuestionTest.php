@@ -55,4 +55,14 @@ class QuestionTest extends TestCase
         $question = create(Question::class);
         self::assertInstanceOf(User::class,$question->creator);
     }
+
+    /** @test */
+    public function can_publish_a_question()
+    {
+        $question = create(Question::class,['published_at' => null]);
+
+        self::assertCount(0,Question::published()->get());
+        $question->publish();
+        self::assertCount(1,Question::published()->get());
+    }
 }

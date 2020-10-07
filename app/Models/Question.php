@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,5 +30,12 @@ class Question extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function publish()
+    {
+        $this->update([
+            'published_at' => Carbon::now(),
+        ]);
     }
 }
