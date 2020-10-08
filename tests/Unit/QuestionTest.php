@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Answer;
 use App\Models\Question;
+use App\Models\Subscription;
 use App\Models\User;
 use Carbon\Carbon;
 use Tests\TestCase;
@@ -82,5 +83,38 @@ class QuestionTest extends TestCase
         $question = create(Question::class);
         create(Answer::class,['question_id' => $question->id]);
         self::assertEquals(1,$question->refresh()->answers_count);
+    }
+
+    /** @test */
+    public function question_can_be_subscribe_to()
+    {
+        $user = create(User::class);
+        $question = create(Question::class,['user_id' => $user->id]);
+        $question->subscribe($user);
+
+        self::assertEquals(1,$question->subscriptions()->where('user_id',$user->id)->count());
+    }
+
+    /** @test */
+    public function question_can_be_unsubscribed_from()
+    {
+        $user = create(User::class);
+        $question = create(Question::class,['user_id' => $user->id]);
+        $question->subscribe($user);
+        $question->unsubscribe($user);
+
+        self::assertEquals(0,$question->subscriptions()->where('user_id',$user->id)->count());
+    }
+
+    /** @test */
+    public function question_can_add_answer()
+    {
+        $question = create(Question::class);
+        $question->addAnswer([
+            'content' => create(Answer::class)->content,
+            'user_id' => create(User::class)->id,
+        ]);
+
+        self::assertEquals(1,$question->refresh()->answers()->count());
     }
 }

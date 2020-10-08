@@ -18,6 +18,8 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/questions/{category?}', 'QuestionsController@index')->name('questions.list')->where(['category' => '[\w-]+']);
 
     Route::group(['middleware' => 'auth:api'], function () {
+        Route::post('/questions/{question}/subscriptions','SubscribeQuestionsController@store')->name('subscribe-questions.store');
+        Route::delete('/questions/{question}/subscriptions','SubscribeQuestionsController@destroy')->name('subscribe-questions.destroy');
         // answers votes
         Route::post('/questions/{question}/answers', 'AnswersController@store')->name('answers.store');
         Route::delete('/answers/{answer}', 'AnswersController@destroy')->name('answers.destroy');

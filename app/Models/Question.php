@@ -12,10 +12,6 @@ class Question extends Model
 {
     use VoteTrait;
     protected $guarded = ['id'];
-    public function answers(): HasMany
-    {
-        return $this->hasMany(Answer::class);
-    }
 
     public function scopePublished($query)
     {
@@ -34,9 +30,19 @@ class Question extends Model
         ]);
     }
 
+    public function answers(): HasMany
+    {
+        return $this->hasMany(Answer::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
     }
 
     public function publish()
@@ -50,5 +56,26 @@ class Question extends Model
     {
         preg_match_all('#@([^\s.]+)#',$this->content,$matches);
         return $matches[1];
+    }
+
+    public function subscribe($user)
+    {
+        $this->subscriptions()->create([
+            'user_id' => $user->id,
+        ]);
+
+        return $this;
+    }
+
+    public function unsubscribe($user)
+    {
+        $this->subscriptions()->where('user_id',$user->id)->delete();
+        return $this;
+    }
+
+    public function addAnswer($answer)
+    {
+        $this->answers()->create($answer);
+        return $this;
     }
 }
