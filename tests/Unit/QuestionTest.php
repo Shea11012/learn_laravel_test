@@ -4,9 +4,9 @@ namespace Tests\Unit;
 
 use App\Models\Answer;
 use App\Models\Question;
-use App\Models\Subscription;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Notifications\QuestionWasUpdated;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -116,5 +116,19 @@ class QuestionTest extends TestCase
         ]);
 
         self::assertEquals(1,$question->refresh()->answers()->count());
+    }
+
+    /** @test */
+    public function notify_all_subscribers_when_an_answer_is_added()
+    {
+        Notification::fake();
+        $user = create(User::class);
+        $question = create(Question::class);
+        $question->subscribe($user)
+            ->addAnswer([
+                'content' => 'Foobar',
+                'user_id' => 999,
+            ]);
+        Notification::assertSentTo($user,QuestionWasUpdated::class);
     }
 }

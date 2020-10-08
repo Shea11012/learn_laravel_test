@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\VoteTrait;
+use App\Notifications\QuestionWasUpdated;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -75,7 +76,13 @@ class Question extends Model
 
     public function addAnswer($answer)
     {
-        $this->answers()->create($answer);
-        return $this;
+        $answer = $this->answers()->create($answer);
+
+        $this->subscriptions
+            ->where('user_id','!=',$answer->user_id)
+            ->each
+            ->notify($answer);
+
+        return $answer;
     }
 }
