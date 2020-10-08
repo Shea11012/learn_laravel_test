@@ -17,7 +17,7 @@ class DeleteAnswersTest extends TestCase
     public function guests_cannot_delete_answers()
     {
         $this->expectException(AuthenticationException::class);
-        $answer = create(Answer::class);
+        $model = create($this->getModel());
         $this->delete(route('answers.destroy',['answer' => $answer]),['answer' => $answer]);
     }
 
@@ -26,7 +26,7 @@ class DeleteAnswersTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
         $this->signIn();
-        $answer = create(Answer::class);
+        $model = create($this->getModel());
         $response = $this->delete(route('answers.destroy',['answer' => $answer]));
 
         $response->assertStatus(200);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\VoteTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Question extends Model
 {
+    use VoteTrait;
     protected $guarded = ['id'];
     public function answers(): HasMany
     {
