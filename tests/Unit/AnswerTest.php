@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use App\Models\Answer;
 use App\Models\User;
 use App\Models\Vote;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,7 +16,7 @@ class AnswerTest extends TestCase
     /** @test */
     public function it_knows_if_it_is_the_best()
     {
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         self::assertFalse($answer->isBest());
 
         $answer->question->update(['best_answer_id' => $answer->id]);
@@ -28,7 +27,7 @@ class AnswerTest extends TestCase
     /** @test */
     public function an_answer_belongs_to_an_owner()
     {
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         self::assertInstanceOf(User::class,$answer->owner);
     }
 
@@ -36,7 +35,7 @@ class AnswerTest extends TestCase
     public function can_vote_up_an_answer()
     {
         $this->signIn();
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
 
         $this->assertDatabaseMissing('votes',[
             'user_id' => auth()->id(),
@@ -60,7 +59,7 @@ class AnswerTest extends TestCase
     {
         $this->signIn();
 
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         $answer->voteUp(\Auth::user());
         $answer->cancelVoteUp(\Auth::user());
         $this->assertDatabaseMissing('votes',[
@@ -74,7 +73,7 @@ class AnswerTest extends TestCase
     public function can_know_it_is_voted_up()
     {
         $user = create(User::class);
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         create(Vote::class,[
             'user_id' => $user->id,
             'voted_id' => $answer->id,
@@ -88,7 +87,7 @@ class AnswerTest extends TestCase
     public function can_vote_down_an_answer()
     {
         $this->signIn();
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         $this->assertDatabaseMissing('votes',[
             'user_id' => auth()->id(),
             'voted_id' => $answer->id,
@@ -110,7 +109,7 @@ class AnswerTest extends TestCase
     public function can_cancel_vote_down_answer()
     {
         $this->signIn();
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         $answer->voteDown(\Auth::user());
         $answer->cancelVoteDown(\Auth::user());
         $this->assertDatabaseMissing('votes',[
@@ -124,12 +123,12 @@ class AnswerTest extends TestCase
     public function can_vote_down_only_once()
     {
         $this->signIn();
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         try {
             $this->post(route('answer-down-votes.destroy',['answer' => $answer]));
             $this->post(route('answer-down-votes.destroy',['answer' => $answer]));
         } catch (\Exception $exception) {
-            $this->fail('Can not vote down twice');
+            self::fail('Can not vote down twice');
         }
 
         self::assertCount(1,$answer->refresh()->votes('vote_down')->get());
@@ -139,7 +138,7 @@ class AnswerTest extends TestCase
     public function can_know_it_is_voted_down()
     {
         $user = create(User::class);
-        $model = create($this->getModel());
+        $answer = create(Answer::class);
         create(Vote::class,[
             'user_id' => $user->id,
             'voted_id' => $answer->id,

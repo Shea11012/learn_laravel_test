@@ -24,7 +24,7 @@ class ViewQuestionsTest extends TestCase
     public function user_can_view_a_published_question()
     {
         $question = factory(Question::class)->create(['published_at' => Carbon::parse('-1 week')]);
-        $this->get('/api/v1/questions/'.$question->id)
+        $this->get(route('questions.show',['question' => $question]))
             ->assertStatus(200)
             ->assertSee($question->title)
             ->assertSee($question->content);
@@ -43,7 +43,7 @@ class ViewQuestionsTest extends TestCase
     {
         $question = factory(Question::class)->states('published')->create();
 
-        $test = $this->get('/api/v1/questions/'.$question->id);
+        $test = $this->get(route('questions.show',['question' => $question]));
 
         $test->assertStatus(200)
             ->assertSee($question->title)

@@ -13,10 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 Route::group(['prefix' => 'v1'], function () {
-    Route::get('/questions/{category?}', 'QuestionsController@index')->name('questions.list');
-    Route::get('/questions/{question}', 'QuestionsController@show')->name('questions.show');
+    // question list
+    Route::get('/questions/{question}', 'QuestionsController@show')->name('questions.show')->where(['question' => '\d+']);
+    Route::get('/questions/{category?}', 'QuestionsController@index')->name('questions.list')->where(['category' => '[\w-]+']);
 
     Route::group(['middleware' => 'auth:api'], function () {
+        // answers votes
         Route::post('/questions/{question}/answers', 'AnswersController@store')->name('answers.store');
         Route::delete('/answers/{answer}', 'AnswersController@destroy')->name('answers.destroy');
 
@@ -28,15 +30,18 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/answers/{answer}/down-votes', 'AnswerDownVotesController@store')->name('answer-down-votes.store');
         Route::delete('/answers/{answer}/down-votes', 'AnswerDownVotesController@destroy')->name('answer-down-votes.destroy');
 
+        // question votes
         Route::post('/questions/{question}/up-votes','QuestionUpVotesController@store')->name('question-up-votes.store');
         Route::delete('/questions/{question}/up-votes','QuestionUpVotesController@destroy')->name('question-up-votes.destroy');
         Route::post('/questions/{question}/down-votes','QuestionDownVotesController@store')->name('question-down-votes.store');
         Route::delete('/questions/{question}/down-votes','QuestionDownVotesController@destroy')->name('question-down-votes.destroy');
 
+        // add question must verify email
         Route::group(['middleware' => ['must-verify-email'],], function () {
             Route::post('/questions', 'QuestionsController@store')->name('questions.store');
         });
 
+        // publish question
         Route::post('/questions/{question}/published-questions', 'PublishedQuestionsController@store')->name('published-questions.store');
     });
 });
