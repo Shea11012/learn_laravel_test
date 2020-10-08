@@ -21,6 +21,7 @@ class CreateQuestionsTable extends Migration
             $table->unsignedInteger('answers_count')->default(0);
             $table->string('title');
             $table->text('content');
+            $table->string('slug')->nullable();
             $table->dateTime('published_at')->nullable();
             $table->timestamps();
         });

@@ -86,4 +86,16 @@ class CreateQuestionsTest extends TestCase
             'message' => 'please verify your email',
         ]);
     }
+
+    /** @test */
+    public function get_slug_when_create_a_question()
+    {
+        $this->signIn();
+
+        $question = make(Question::class,['title' => '英语 英语']);
+        $this->post(route('questions.store'),$question->toArray());
+
+        $storedQuestion = Question::first();
+        self::assertEquals('english-english',$storedQuestion->slug);
+    }
 }

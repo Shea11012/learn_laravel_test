@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Question;
+use App\Observers\QuestionObserver;
+use App\Translator\BaiduSlugTranslator;
+use App\Translator\Translator;
 use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Manager;
@@ -16,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
+        Question::observe(QuestionObserver::class);
     }
 
     /**
@@ -26,6 +30,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->bind(Translator::class,BaiduSlugTranslator::class);
     }
 }

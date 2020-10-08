@@ -11,12 +11,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function success($data = [])
+    protected function success($data = [])
     {
         return $this->json($data,200,200);
     }
 
-    public function json($data,$code,$httpCode)
+    protected function json($data,$code,$httpCode)
     {
         $data = [
             'code' => $code,
@@ -24,5 +24,13 @@ class Controller extends BaseController
         ];
 
         return response()->json($data,$httpCode);
+    }
+
+    protected function appendVotedAttribute($item)
+    {
+        $item->isVotedUp = $item->isVotedUp(\Auth::user());
+        $item->isVotedDown = $item->isVotedDown(\Auth::user());
+
+        return $item;
     }
 }

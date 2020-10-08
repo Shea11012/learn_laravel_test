@@ -14,6 +14,12 @@ class Question extends Model
     use VoteTrait;
     protected $guarded = ['id'];
 
+    protected $appends = [
+        'upVotesCount',
+        'downVotesCount',
+        'subscriptionsCount',
+    ];
+
     public function scopePublished($query)
     {
         return $query->whereNotNull('published_at');
@@ -31,6 +37,11 @@ class Question extends Model
         ]);
     }
 
+    public function getSubscriptionsCountAttribute()
+    {
+        return $this->subscriptions->count();
+    }
+
     public function answers(): HasMany
     {
         return $this->hasMany(Answer::class);
@@ -39,6 +50,11 @@ class Question extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function subscriptions(): HasMany
@@ -84,5 +100,18 @@ class Question extends Model
             ->notify($answer);
 
         return $answer;
+    }
+
+    public function isSubscribedTo($user)
+    {
+        if (!$user) {
+            return false;
+        }
+        return $this->subscriptions()->where('user_id',$user->id)->exists();
+    }
+
+    public function path()
+    {
+        return route('questions.show',[$this->category->slug, $this, $this->slug ?: null]);
     }
 }

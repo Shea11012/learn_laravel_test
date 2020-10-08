@@ -3,6 +3,8 @@
 namespace Tests;
 
 use App\Models\User;
+use App\Translator\FakeSlugTranslator;
+use App\Translator\Translator;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +23,8 @@ abstract class TestCase extends BaseTestCase
             }
             return $this->getOriginalContent()[$key];
         });
+
+        $this->app->instance(Translator::class,new FakeSlugTranslator);
     }
 
     protected function signIn($user = null, $guard = 'api'): TestCase

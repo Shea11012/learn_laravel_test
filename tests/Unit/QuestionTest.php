@@ -2,11 +2,14 @@
 
 namespace Tests\Unit;
 
+use App\Jobs\TranslateSlug;
 use App\Models\Answer;
+use App\Models\Category;
 use App\Models\Question;
 use App\Models\User;
 use App\Notifications\QuestionWasUpdated;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -130,5 +133,34 @@ class QuestionTest extends TestCase
                 'user_id' => 999,
             ]);
         Notification::assertSentTo($user,QuestionWasUpdated::class);
+    }
+
+    /** @test */
+    public function a_translate_slug_job_is_pushed_when_create_question()
+    {
+        Queue::fake();
+        create(Question::class,['title' => '英语 英语']);
+
+        Queue::assertPushed(TranslateSlug::class);
+    }
+
+    /** @test */
+    public function questioni_has_a_path()
+    {
+        $category = create(Category::class);
+
+        $slug = 'english-english';
+        $question = create(Question::class,[
+            'slug' => $slug,
+            'category_id' => $category->id,
+        ]);
+        self::assertEquals(route('questions.show',['category'=>$question->category->slug, 'question' => $question, $slug ?: null]),$question->path());
+    }
+
+    /** @test */
+    public function a_queston_belongs_to_a_category()
+    {
+        $question = create(Question::class);
+        self::assertInstanceOf(Category::class,$question->category);
     }
 }

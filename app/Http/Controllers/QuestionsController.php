@@ -21,12 +21,22 @@ class QuestionsController extends Controller
 
         $questions = $questions->filter($filters)->paginate(20);
 //        $rs = csPaginate($questions->toBase(),$questions->total(),$questions->perPage());
+
+        array_map(function (&$item) {
+            return $this->appendAttribute($item);
+        },$questions->items());
         return new QuestionsListResource($questions);
     }
 
     public function show($questionId)
     {
         $question = Question::published()->findOrFail($questionId);
+
+        $answers = $question->answers()->paginate(20);
+
+        array_map(function (&$item) {
+            return $this->appendVotedAttribute($item);
+        },$answers->items());
 
         return new QuestionsShowResource($question);
     }
@@ -47,5 +57,16 @@ class QuestionsController extends Controller
         ]);
 
         return $this->success();
+    }
+
+    protected function appendAttribute($item)
+    {
+        $user = \Auth::user();
+
+        $item->isVotedUp = $item->isVotedUp($user);
+        $item->isVotedDown = $item->isVotedDown($user);
+        $item->isSubscribedTo = $item->isSubscribedTo($user);
+
+        return $item;
     }
 }

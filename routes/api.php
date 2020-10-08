@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 Route::group(['prefix' => 'v1'], function () {
     // question list
-    Route::get('/questions/{question}', 'QuestionsController@show')->name('questions.show')->where(['question' => '\d+']);
+    Route::get('/questions/{category}/{question}/{slug?}', 'QuestionsController@show')->name('questions.show')->where(['question' => '\d+','category' => '[\w-]+','slug' => '[\w-]+']);
     Route::get('/questions/{category?}', 'QuestionsController@index')->name('questions.list')->where(['category' => '[\w-]+']);
 
     Route::group(['middleware' => 'auth:api'], function () {

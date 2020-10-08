@@ -41,4 +41,28 @@ class SubscribeQuestionsTest extends TestCase
 
         self::assertCount(0,$question->subscriptions);
     }
+
+    /** @test */
+    public function can_know_it_if_subscribe_to()
+    {
+        $this->signIn();
+        $question = factory(Question::class)->states('published')->create();
+
+        $this->post(route('subscribe-questions.store',['question' => $question]));
+        self::assertTrue($question->refresh()->isSubscribedTo(\Auth::user()));
+    }
+
+    /** @test */
+    public function can_know_subscriptions_count()
+    {
+        $question = factory(Question::class)->states('published')->create();
+
+        $this->signIn();
+        $this->post(route('subscribe-questions.store',['question' => $question]));
+        self::assertEquals(1,$question->refresh()->subscriptionsCount);
+
+        $this->signIn();
+        $this->post(route('subscribe-questions.store',['question' => $question]));
+        self::assertEquals(2,$question->refresh()->subscriptionsCount);
+    }
 }
