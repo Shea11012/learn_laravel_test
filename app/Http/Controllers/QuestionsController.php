@@ -2,24 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\QuestionsListResource;
+use App\Http\Resources\QuestionsShowResource;
+use App\Models\Category;
 use App\Models\Question;
-use Illuminate\Http\Request;
+use App\Models\User;
+use App\Filters\QuestionFilter;
 
 class QuestionsController extends Controller
 {
-    public function index()
+    public function index(Category $category,QuestionFilter $filters)
     {
-        
+        if ($category->exists) {
+            $questions = Question::published()->where('category_id',$category->id);
+        } else {
+            $questions = Question::published();
+        }
+
+        $questions = $questions->filter($filters)->paginate(20);
+//        $rs = csPaginate($questions->toBase(),$questions->total(),$questions->perPage());
+        return new QuestionsListResource($questions);
     }
 
     public function show($questionId)
     {
         $question = Question::published()->findOrFail($questionId);
 
-        return response()->json([
-            'question'=>$question,
-            'answers' => $question->answers()->paginate(20),
-        ]);
+        return new QuestionsShowResource($question);
     }
 
     public function store()

@@ -33,7 +33,8 @@
             "Tests\\": "tests/"
         },
         "files": [
-            "tests/helpers.php"
+            "tests/helpers.php",
+            "app/helper.php"
         ]
     },
     "extra": {

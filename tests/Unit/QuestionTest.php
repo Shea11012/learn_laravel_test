@@ -65,4 +65,22 @@ class QuestionTest extends TestCase
         $question->publish();
         self::assertCount(1,Question::published()->get());
     }
+
+    /** @test */
+    public function it_can_detect_all_invited_users()
+    {
+        $question = create(Question::class,[
+            'content' => '@Jane @Luke please help me!',
+        ]);
+
+        self::assertEquals(['Jane','Luke'],$question->invitedUsers());
+    }
+
+    /** @test */
+    public function question_has_answers_count()
+    {
+        $question = create(Question::class);
+        create(Answer::class,['question_id' => $question->id]);
+        self::assertEquals(1,$question->refresh()->answers_count);
+    }
 }

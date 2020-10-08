@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 Route::group(['prefix' => 'v1'], function () {
-    Route::get('questions', 'QuestionsController@index')->name('questions.list');
+    Route::get('/questions/{category?}', 'QuestionsController@index')->name('questions.list');
     Route::get('/questions/{question}', 'QuestionsController@show')->name('questions.show');
 
     Route::group(['middleware' => 'auth:api'], function () {

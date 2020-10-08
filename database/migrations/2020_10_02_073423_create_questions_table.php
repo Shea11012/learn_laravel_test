@@ -18,6 +18,7 @@ class CreateQuestionsTable extends Migration
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('category_id');
             $table->unsignedInteger('best_answer_id')->nullable();
+            $table->unsignedInteger('answers_count')->default(0);
             $table->string('title');
             $table->text('content');
             $table->dateTime('published_at')->nullable();

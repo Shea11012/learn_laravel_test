@@ -20,6 +20,11 @@ class Question extends Model
         return $query->whereNotNull('published_at');
     }
 
+    public function scopeFilter($query,$filters)
+    {
+        return $filters->apply($query);
+    }
+
     public function markAsBestAnswer($answer)
     {
         $this->update([
@@ -37,5 +42,11 @@ class Question extends Model
         $this->update([
             'published_at' => Carbon::now(),
         ]);
+    }
+
+    public function invitedUsers()
+    {
+        preg_match_all('#@([^\s.]+)#',$this->content,$matches);
+        return $matches[1];
     }
 }

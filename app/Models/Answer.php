@@ -13,6 +13,20 @@ class Answer extends Model
         'id',
     ];
 
+    protected $appends = [
+        'upVotesCount',
+        'downVotesCount',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(static function ($answer) {
+            $answer->question->increment('answers_count');
+        });
+    }
+
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);
