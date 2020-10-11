@@ -49,7 +49,12 @@ Route::group(['prefix' => 'v1'], function () {
         // comments
         Route::post('/questions/{question}/comments','QuestionCommentsController@store')->name('question-comments.store');
 
-        // answer comments
         Route::post('/answers/{answer}/comments','AnswerCommentsController@store')->name('answer-comments.store');
+
+        Route::post('/comments/{comment}/up-votes','CommentUpVotesController@store')->name('comment-up-votes.store');
+        Route::delete('/comments/{comment}/up-votes','CommentUpVotesController@destroy')->name('comment-up-votes.destroy');
+
+        Route::post('/comments/{comment}/down-votes','CommentDownVotesController@store')->name('comment-down-votes.store');
+        Route::delete('/comments/{comment}/down-votes','CommentDownVotesController@destroy')->name('comment-down-votes.destroy');
     });
 });
