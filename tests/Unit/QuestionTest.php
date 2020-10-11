@@ -5,9 +5,11 @@ namespace Tests\Unit;
 use App\Jobs\TranslateSlug;
 use App\Models\Answer;
 use App\Models\Category;
+use App\Models\Comment;
 use App\Models\Question;
 use App\Models\User;
 use App\Notifications\QuestionWasUpdated;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -162,5 +164,36 @@ class QuestionTest extends TestCase
     {
         $question = create(Question::class);
         self::assertInstanceOf(Category::class,$question->category);
+    }
+
+    /** @test */
+    public function a_question_has_may_comments()
+    {
+        $question = factory(Question::class)->create();
+
+        create(Comment::class,[
+            'commented_id' => $question->id,
+            'commented_type' => $question->getMorphClass(),
+            'content' => 'it is a comment'
+        ]);
+
+        self::assertInstanceOf(MorphMany::class,$question->comments());
+    }
+
+    /** @test */
+    public function can_comment_a_question()
+    {
+        $question = create(Question::class);
+        $question->comment('it is content',create(User::class));
+        self::assertEquals(1,$question->refresh()->comments()->count());
+    }
+
+    /** @test */
+    public function can_get_comments_count_attribute()
+    {
+        $question = create(Question::class);
+        $question->comment('it is content',create(User::class));
+
+        self::assertEquals(1,$question->refresh()->commentsCount);
     }
 }

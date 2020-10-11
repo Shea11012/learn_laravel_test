@@ -18,6 +18,7 @@ class Question extends Model
         'upVotesCount',
         'downVotesCount',
         'subscriptionsCount',
+        'commentsCount',
     ];
 
     public function scopePublished($query)
@@ -60,6 +61,19 @@ class Question extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class,'commented');
+    }
+
+    public function comment($content,$user)
+    {
+        return $this->comments()->create([
+            'user_id' => $user->id,
+            'content' => $content,
+        ]);
     }
 
     public function publish()
@@ -113,5 +127,10 @@ class Question extends Model
     public function path()
     {
         return route('questions.show',[$this->category->slug, $this, $this->slug ?: null]);
+    }
+
+    public function getCommentsCountAttribute()
+    {
+        return $this->comments()->count();
     }
 }

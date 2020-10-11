@@ -28,7 +28,7 @@ class QuestionsController extends Controller
         return new QuestionsListResource($questions);
     }
 
-    public function show($questionId)
+    public function show($category,$questionId)
     {
         $question = Question::published()->findOrFail($questionId);
 

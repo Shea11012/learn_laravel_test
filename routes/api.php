@@ -45,5 +45,8 @@ Route::group(['prefix' => 'v1'], function () {
 
         // publish question
         Route::post('/questions/{question}/published-questions', 'PublishedQuestionsController@store')->name('published-questions.store');
+
+        // comments
+        Route::post('/questions/{question}/comments','QuestionCommentsController@store')->name('question-comments.store');
     });
 });
