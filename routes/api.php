@@ -48,5 +48,8 @@ Route::group(['prefix' => 'v1'], function () {
 
         // comments
         Route::post('/questions/{question}/comments','QuestionCommentsController@store')->name('question-comments.store');
+
+        // answer comments
+        Route::post('/answers/{answer}/comments','AnswerCommentsController@store')->name('answer-comments.store');
     });
 });

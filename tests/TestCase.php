@@ -7,15 +7,18 @@ use App\Translator\FakeSlugTranslator;
 use App\Translator\Translator;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\JsonResponse;
 
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
+    use WithFaker;
 
     protected function setUp()
     {
         parent::setUp();
+        $this->setUpFaker();
         $this->withoutExceptionHandling();
         TestResponse::macro('jsonData', function ($key) {
             if ($this->baseResponse instanceof JsonResponse) {

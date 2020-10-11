@@ -3,10 +3,11 @@
 namespace Tests\Unit;
 
 use App\Models\Answer;
+use App\Models\Comment;
 use App\Models\User;
 use App\Models\Vote;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AnswerTest extends TestCase
@@ -147,5 +148,34 @@ class AnswerTest extends TestCase
         ]);
 
         self::assertTrue($answer->refresh()->isVotedDown($user));
+    }
+
+    /** @test */
+    public function an_answer_has_many_comments()
+    {
+        $answer = create(Answer::class);
+        create(Comment::class,[
+            'commented_id' => $answer->id,
+            'commented_type' => $answer->getMorphClass(),
+            'content' => 'it is a comment',
+        ]);
+
+        self::assertInstanceOf(MorphMany::class,$answer->comments());
+    }
+
+    /** @test */
+    public function can_comment_an_answer()
+    {
+        $answer = create(Answer::class);
+        $answer->comment('it is content',create(User::class));
+        self::assertEquals(1,$answer->refresh()->comments()->count());
+    }
+
+    /** @test */
+    public function can_get_comments_count_attribute()
+    {
+        $answer = create(Answer::class);
+        $answer->comment($this->faker->sentence(10,true),create(User::class));
+        self::assertEquals(1,$answer->refresh()->commentsCount);
     }
 }
