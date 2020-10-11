@@ -16,10 +16,15 @@ Route::group(['prefix' => 'v1'], function () {
     // question list
     Route::get('/questions/{category}/{question}/{slug?}', 'QuestionsController@show')->name('questions.show')->where(['question' => '\d+','category' => '[\w-]+','slug' => '[\w-]+']);
     Route::get('/questions/{category?}', 'QuestionsController@index')->name('questions.list')->where(['category' => '[\w-]+']);
+    Route::get('/questions/{question}/comments','QuestionCommentsController@index')->name('question-comments.index');
+    Route::get('/answers/{answer}/comments','AnswerCommentsController@index')->name('answer-comments.index');
+
 
     Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/questions/{question}/subscriptions','SubscribeQuestionsController@store')->name('subscribe-questions.store');
         Route::delete('/questions/{question}/subscriptions','SubscribeQuestionsController@destroy')->name('subscribe-questions.destroy');
+
+        Route::post('/questions/{question}/comments','QuestionCommentsController@store')->name('question-comments.store');
         // answers votes
         Route::post('/questions/{question}/answers', 'AnswersController@store')->name('answers.store');
         Route::delete('/answers/{answer}', 'AnswersController@destroy')->name('answers.destroy');
