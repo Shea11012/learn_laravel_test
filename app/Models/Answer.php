@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\CommentTrait;
 use App\Models\Traits\VoteTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Answer extends Model
 {
-    use VoteTrait;
+    use VoteTrait,CommentTrait;
     protected $guarded = [
         'id',
     ];
@@ -36,24 +37,6 @@ class Answer extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class,'user_id');
-    }
-
-    public function comments()
-    {
-        return $this->morphMany(Comment::class,'commented');
-    }
-
-    public function getCommentsCountAttribute()
-    {
-        return $this->comments()->count();
-    }
-
-    public function comment($content,$user)
-    {
-        return $this->comments()->create([
-            'user_id' => $user->id,
-            'content' => $content,
-        ]);
     }
 
     public function isBest(): bool

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\CommentTrait;
 use App\Models\Traits\VoteTrait;
 use App\Notifications\QuestionWasUpdated;
 use Carbon\Carbon;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Question extends Model
 {
     use VoteTrait;
+    use CommentTrait;
     protected $guarded = ['id'];
 
     protected $appends = [
@@ -61,19 +63,6 @@ class Question extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
-    }
-
-    public function comments()
-    {
-        return $this->morphMany(Comment::class,'commented');
-    }
-
-    public function comment($content,$user)
-    {
-        return $this->comments()->create([
-            'user_id' => $user->id,
-            'content' => $content,
-        ]);
     }
 
     public function publish()
@@ -127,10 +116,5 @@ class Question extends Model
     public function path()
     {
         return route('questions.show',[$this->category->slug, $this, $this->slug ?: null]);
-    }
-
-    public function getCommentsCountAttribute()
-    {
-        return $this->comments()->count();
     }
 }
