@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Event\PostComment;
 use App\Jobs\TranslateSlug;
 use App\Models\Answer;
 use App\Models\Category;
@@ -9,7 +10,9 @@ use App\Models\Comment;
 use App\Models\Question;
 use App\Models\User;
 use App\Notifications\QuestionWasUpdated;
+use App\Notifications\YouWereMentionedInComment;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -195,5 +198,41 @@ class QuestionTest extends TestCase
         $question->comment('it is content',create(User::class));
 
         self::assertEquals(1,$question->refresh()->commentsCount);
+    }
+
+    /** @test */
+    public function an_event_is_dispatched_when_a_comment_is_added()
+    {
+        Event::fake();
+
+        $user = create(User::class);
+        $question = create(Question::class);
+
+        $question->comment('it is a content',$user);
+
+        Event::assertDispatched(PostComment::class);
+    }
+
+    /** @test */
+    public function a_notification_is_sent_when_a_comment_is_added()
+    {
+        Notification::fake();
+        $john = create(User::class,[
+            'name' => 'John',
+        ]);
+
+        $question = create(Question::class);
+        $question->comment('@John thank you',$john);
+
+        Notification::assertSentTo($john,YouWereMentionedInComment::class);
+    }
+
+    /** @test  */
+    public function can_get_comment_endpoint_attribute()
+    {
+        $question = create(Question::class);
+        $question->comment('it is content',create(User::class));
+
+        self::assertEquals(route('question-comments.index',[$question]),$question->refresh()->commentEndpoint);
     }
 }

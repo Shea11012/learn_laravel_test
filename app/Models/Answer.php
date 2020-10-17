@@ -18,6 +18,7 @@ class Answer extends Model
         'upVotesCount',
         'downVotesCount',
         'commentsCount',
+        'commentEndpoint',
     ];
 
     protected static function boot()

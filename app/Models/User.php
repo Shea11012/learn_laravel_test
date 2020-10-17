@@ -19,6 +19,10 @@ class User extends Authenticatable implements JWTSubject
         'name', 'email', 'password',
     ];
 
+    protected $appends = [
+        'userAvatar',
+    ];
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -36,5 +40,21 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    public function getUserAvatarAttribute()
+    {
+        return $this->avatar();
+    }
+
+    public function avatar()
+    {
+        if ($this->avatar_path) {
+            $filePath = $this->avatar_path;
+        } else {
+            $filePath = 'avatars/default.png';
+        }
+
+        return asset('storage/'.$filePath);
     }
 }

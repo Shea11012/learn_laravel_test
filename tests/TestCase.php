@@ -5,6 +5,7 @@ namespace Tests;
 use App\Models\User;
 use App\Translator\FakeSlugTranslator;
 use App\Translator\Translator;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Foundation\Testing\TestResponse;
 use Illuminate\Foundation\Testing\WithFaker;

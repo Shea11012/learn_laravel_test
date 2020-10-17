@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\Events\PublishQuestion;
 use App\Listeners\NotifyInvitedUsers;
+use App\Event\PostComment;
+use App\Listener\NotifyMentionedUsersInComment;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -17,6 +19,9 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         PublishQuestion::class => [
             NotifyInvitedUsers::class,
+        ],
+        PostComment::class => [
+            NotifyMentionedUsersInComment::class,
         ],
     ];
 

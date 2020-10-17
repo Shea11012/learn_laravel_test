@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\CommentTrait;
+use App\Models\Traits\InvitedUsersTrait;
 use App\Models\Traits\VoteTrait;
 use App\Notifications\QuestionWasUpdated;
 use Carbon\Carbon;
@@ -13,14 +14,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Question extends Model
 {
     use VoteTrait;
-    use CommentTrait;
+    use CommentTrait,InvitedUsersTrait;
     protected $guarded = ['id'];
+    protected $with = ['category'];
 
     protected $appends = [
         'upVotesCount',
         'downVotesCount',
         'subscriptionsCount',
         'commentsCount',
+        'commentEndpoint',
     ];
 
     public function scopePublished($query)
@@ -70,12 +73,6 @@ class Question extends Model
         $this->update([
             'published_at' => Carbon::now(),
         ]);
-    }
-
-    public function invitedUsers()
-    {
-        preg_match_all('#@([^\s.]+)#',$this->content,$matches);
-        return $matches[1];
     }
 
     public function subscribe($user)

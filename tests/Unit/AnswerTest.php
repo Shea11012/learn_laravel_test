@@ -178,4 +178,12 @@ class AnswerTest extends TestCase
         $answer->comment($this->faker->sentence(10,true),create(User::class));
         self::assertEquals(1,$answer->refresh()->commentsCount);
     }
+
+    /** @test */
+    public function can_get_comment_endpoint_attribute()
+    {
+        $answer = create(Answer::class);
+        $answer->comment('it is content',create(User::class));
+        self::assertEquals(route("answer-comments.index",[$answer]),$answer->refresh()->commentEndpoint);
+    }
 }
