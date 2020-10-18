@@ -11,7 +11,7 @@ use App\Filters\QuestionFilter;
 
 class QuestionsController extends Controller
 {
-    public function index(Category $category,QuestionFilter $filters)
+    public function index(Category $category,QuestionFilter $filters,User $user)
     {
         if ($category->exists) {
             $questions = Question::published()->where('category_id',$category->id);
@@ -25,7 +25,12 @@ class QuestionsController extends Controller
         array_map(function (&$item) {
             return $this->appendAttribute($item);
         },$questions->items());
-        return new QuestionsListResource($questions);
+
+        $activeUsers = $user->getActvieUsers();
+        return response()->json([
+            'questions' => $questions,
+            'activeUsers' => $activeUsers,
+        ]);
     }
 
     public function show($category,$questionId)
