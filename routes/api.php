@@ -65,5 +65,6 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/users/{user}/avatar','UserAvatarsController@store')->name('user-avatar.store');
 
         Route::get('/profiles/{user}','ProfilesController@show')->name('users.show');
+        Route::get('/notifications','UserNotificationsController@index')->name('user-notifications.index');
     });
 });
