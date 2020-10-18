@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Models\Traits\CommentTrait;
+use App\Models\Traits\RecordActivityTrait;
 use App\Models\Traits\VoteTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Answer extends Model
 {
-    use VoteTrait,CommentTrait;
+    use VoteTrait,CommentTrait,RecordActivityTrait;
     protected $guarded = [
         'id',
     ];

@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AnswerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase,ActivitiesContractTest;
 
     /** @test */
     public function it_knows_if_it_is_the_best()
@@ -185,5 +185,15 @@ class AnswerTest extends TestCase
         $answer = create(Answer::class);
         $answer->comment('it is content',create(User::class));
         self::assertEquals(route("answer-comments.index",[$answer]),$answer->refresh()->commentEndpoint);
+    }
+
+    protected function getActivityModel()
+    {
+        return create(Answer::class);
+    }
+
+    protected function getActivityType()
+    {
+        return 'created_answer';
     }
 }

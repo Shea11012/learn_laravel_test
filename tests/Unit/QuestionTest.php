@@ -22,9 +22,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class QuestionTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, ActivitiesContractTest;
 
-    /** @test */
+        /** @test */
     public function a_question_has_many_answers()
     {
         $question = factory(Question::class)->create();
@@ -62,56 +62,56 @@ class QuestionTest extends TestCase
     public function a_question_belongs_to_a_creator()
     {
         $question = create(Question::class);
-        self::assertInstanceOf(User::class,$question->creator);
+        self::assertInstanceOf(User::class, $question->creator);
     }
 
     /** @test */
     public function can_publish_a_question()
     {
-        $question = create(Question::class,['published_at' => null]);
+        $question = create(Question::class, ['published_at' => null]);
 
-        self::assertCount(0,Question::published()->get());
+        self::assertCount(0, Question::published()->get());
         $question->publish();
-        self::assertCount(1,Question::published()->get());
+        self::assertCount(1, Question::published()->get());
     }
 
     /** @test */
     public function it_can_detect_all_invited_users()
     {
-        $question = create(Question::class,[
+        $question = create(Question::class, [
             'content' => '@Jane @Luke please help me!',
         ]);
 
-        self::assertEquals(['Jane','Luke'],$question->invitedUsers());
+        self::assertEquals(['Jane', 'Luke'], $question->invitedUsers());
     }
 
     /** @test */
     public function question_has_answers_count()
     {
         $question = create(Question::class);
-        create(Answer::class,['question_id' => $question->id]);
-        self::assertEquals(1,$question->refresh()->answers_count);
+        create(Answer::class, ['question_id' => $question->id]);
+        self::assertEquals(1, $question->refresh()->answers_count);
     }
 
     /** @test */
     public function question_can_be_subscribe_to()
     {
         $user = create(User::class);
-        $question = create(Question::class,['user_id' => $user->id]);
+        $question = create(Question::class, ['user_id' => $user->id]);
         $question->subscribe($user);
 
-        self::assertEquals(1,$question->subscriptions()->where('user_id',$user->id)->count());
+        self::assertEquals(1, $question->subscriptions()->where('user_id', $user->id)->count());
     }
 
     /** @test */
     public function question_can_be_unsubscribed_from()
     {
         $user = create(User::class);
-        $question = create(Question::class,['user_id' => $user->id]);
+        $question = create(Question::class, ['user_id' => $user->id]);
         $question->subscribe($user);
         $question->unsubscribe($user);
 
-        self::assertEquals(0,$question->subscriptions()->where('user_id',$user->id)->count());
+        self::assertEquals(0, $question->subscriptions()->where('user_id', $user->id)->count());
     }
 
     /** @test */
@@ -123,7 +123,7 @@ class QuestionTest extends TestCase
             'user_id' => create(User::class)->id,
         ]);
 
-        self::assertEquals(1,$question->refresh()->answers()->count());
+        self::assertEquals(1, $question->refresh()->answers()->count());
     }
 
     /** @test */
@@ -137,36 +137,36 @@ class QuestionTest extends TestCase
                 'content' => 'Foobar',
                 'user_id' => 999,
             ]);
-        Notification::assertSentTo($user,QuestionWasUpdated::class);
+        Notification::assertSentTo($user, QuestionWasUpdated::class);
     }
 
     /** @test */
     public function a_translate_slug_job_is_pushed_when_create_question()
     {
         Queue::fake();
-        create(Question::class,['title' => '英语 英语']);
+        create(Question::class, ['title' => '英语 英语']);
 
         Queue::assertPushed(TranslateSlug::class);
     }
 
     /** @test */
-    public function questioni_has_a_path()
+    public function question_has_a_path()
     {
         $category = create(Category::class);
 
         $slug = 'english-english';
-        $question = create(Question::class,[
+        $question = create(Question::class, [
             'slug' => $slug,
             'category_id' => $category->id,
         ]);
-        self::assertEquals(route('questions.show',['category'=>$question->category->slug, 'question' => $question, $slug ?: null]),$question->path());
+        self::assertEquals(route('questions.show', ['category' => $question->category->slug, 'question' => $question, $slug ?: null]), $question->path());
     }
 
     /** @test */
     public function a_queston_belongs_to_a_category()
     {
         $question = create(Question::class);
-        self::assertInstanceOf(Category::class,$question->category);
+        self::assertInstanceOf(Category::class, $question->category);
     }
 
     /** @test */
@@ -174,30 +174,30 @@ class QuestionTest extends TestCase
     {
         $question = factory(Question::class)->create();
 
-        create(Comment::class,[
+        create(Comment::class, [
             'commented_id' => $question->id,
             'commented_type' => $question->getMorphClass(),
-            'content' => 'it is a comment'
+            'content' => 'it is a comment',
         ]);
 
-        self::assertInstanceOf(MorphMany::class,$question->comments());
+        self::assertInstanceOf(MorphMany::class, $question->comments());
     }
 
     /** @test */
     public function can_comment_a_question()
     {
         $question = create(Question::class);
-        $question->comment('it is content',create(User::class));
-        self::assertEquals(1,$question->refresh()->comments()->count());
+        $question->comment('it is content', create(User::class));
+        self::assertEquals(1, $question->refresh()->comments()->count());
     }
 
     /** @test */
     public function can_get_comments_count_attribute()
     {
         $question = create(Question::class);
-        $question->comment('it is content',create(User::class));
+        $question->comment('it is content', create(User::class));
 
-        self::assertEquals(1,$question->refresh()->commentsCount);
+        self::assertEquals(1, $question->refresh()->commentsCount);
     }
 
     /** @test */
@@ -208,7 +208,7 @@ class QuestionTest extends TestCase
         $user = create(User::class);
         $question = create(Question::class);
 
-        $question->comment('it is a content',$user);
+        $question->comment('it is a content', $user);
 
         Event::assertDispatched(PostComment::class);
     }
@@ -217,22 +217,31 @@ class QuestionTest extends TestCase
     public function a_notification_is_sent_when_a_comment_is_added()
     {
         Notification::fake();
-        $john = create(User::class,[
+        $john = create(User::class, [
             'name' => 'John',
         ]);
 
         $question = create(Question::class);
-        $question->comment('@John thank you',$john);
+        $question->comment('@John thank you', $john);
 
-        Notification::assertSentTo($john,YouWereMentionedInComment::class);
+        Notification::assertSentTo($john, YouWereMentionedInComment::class);
     }
 
-    /** @test  */
+    /** @test */
     public function can_get_comment_endpoint_attribute()
     {
         $question = create(Question::class);
-        $question->comment('it is content',create(User::class));
+        $question->comment('it is content', create(User::class));
 
-        self::assertEquals(route('question-comments.index',[$question]),$question->refresh()->commentEndpoint);
+        self::assertEquals(route('question-comments.index', [$question]), $question->refresh()->commentEndpoint);
+    }
+    protected function getActivityModel()
+    {
+        return create(Question::class);
+    }
+
+    protected function getActivityType()
+    {
+        return 'published_question';
     }
 }

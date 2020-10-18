@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\CommentTrait;
 use App\Models\Traits\InvitedUsersTrait;
+use App\Models\Traits\RecordActivityTrait;
 use App\Models\Traits\VoteTrait;
 use App\Notifications\QuestionWasUpdated;
 use Carbon\Carbon;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Question extends Model
 {
     use VoteTrait;
-    use CommentTrait,InvitedUsersTrait;
+    use CommentTrait,InvitedUsersTrait,RecordActivityTrait;
     protected $guarded = ['id'];
     protected $with = ['category'];
 
