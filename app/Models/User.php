@@ -47,6 +47,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->avatar();
     }
 
+    public function activities()
+    {
+        return $this->hasMany(Activity::class,'user_id');
+    }
+
     public function avatar()
     {
         if ($this->avatar_path) {
